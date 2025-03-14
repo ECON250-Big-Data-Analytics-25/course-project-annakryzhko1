@@ -1,0 +1,16 @@
+ersion: 2
+
+sources:
+  - name: akryzhko
+    database: econ250-2025
+    schema: akryzhko  
+    tables:
+      - name: international_top_terms
+      - name: sheet_external
+      - name: assignment1_full
+  - name: google_trends
+    database: bigquery-public-data
+    schema: google_trends
+    tables:
+      - name: international_top_terms
+  
