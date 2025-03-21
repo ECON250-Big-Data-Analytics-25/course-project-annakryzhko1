@@ -13,4 +13,36 @@ sources:
     schema: google_trends
     tables:
       - name: international_top_terms
-  
+        loaded_at_field: timestamp(refresh_date)
+        freshness:
+          error_after:
+            count: 2
+            period: day
+          filter: "refresh_date >= current_date() - 7"
+  - name: test_dataset
+    database: econ250-2025  
+    schema: test_dataset  
+    tables:
+      - name: air_raid_alerts_ua
+        loaded_at_field: started_at
+        freshness:
+          error_after:
+            count: 2
+            period: day
+      - name: week3_arxiv
+      - name: week5_web_transactions
+        columns:
+          - name: transaction.transactionId
+            data_tests:
+            - unique:
+                config:
+                  severity: error
+                  error_if: ">100"
+                  warn_if: ">0"
+            - not_null:
+                config:
+                  severity: error
+                  error_if: ">10"
+                  warn_if: ">0"
+      - name: week5_web_visits
+      - name: week5_hits
