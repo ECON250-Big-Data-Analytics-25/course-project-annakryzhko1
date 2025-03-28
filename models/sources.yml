@@ -31,7 +31,14 @@ sources:
             period: day
       - name: week3_arxiv
       - name: week5_web_transactions
+        description: |
+          transaction level data. can be combined with *week5_web_visits* using `visitId` field
+          
+          May contain duplicates, for deduplicated data look at model 'week5_transactions_deduplicated_view'
         columns:
+          - name: visitId
+            description: '{{ doc("visitid_description") }}'
+          - name: date
           - name: transaction.transactionId
             data_tests:
             - unique:
