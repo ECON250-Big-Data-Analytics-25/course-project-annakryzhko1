@@ -1,0 +1,18 @@
+unit_tests:
+  - name: int_assignment3_uk_wiki_is_meta_page
+    model: int_assignment3_uk_wiki
+    given:
+      - input: ref('stg_assignment3_uk_wiki')
+        rows:
+          - {title: "Вікіпедія:Зворотний_зв'язок"}
+          - {title: "Файл:Тарас_Шевченко._Кобзар._1840.pdf"}
+          - {title: "Спеціальна:Пошук"}
+          - {title: "МКХ-10:_Клас_V._Розлади_психіки"}
+          - {title: "S.T.A.L.K.E.R._2:_Серце_Чорнобиля"}
+    expect:
+      rows:
+        - { title: "Вікіпедія:Зворотний_зв'язок", is_meta_page: TRUE }
+        - { title: "Файл:Тарас_Шевченко._Кобзар._1840.pdf", is_meta_page: TRUE }
+        - { title: "Спеціальна:Пошук", is_meta_page: TRUE }
+        - { title: "МКХ-10:_Клас_V._Розлади_психіки", is_meta_page: FALSE }
+        - { title: "S.T.A.L.K.E.R._2:_Серце_Чорнобиля", is_meta_page: FALSE }

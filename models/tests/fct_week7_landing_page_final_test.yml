@@ -1,0 +1,23 @@
+unit_tests:
+  - name: fct_w eek7_landing_page_incremental_mode
+    description: "Testing incremental condition"
+    model: fct_week7_landing_page_final
+    overrides:
+      macros:
+        is_incremental: true
+    given:
+      - input: ref("fct_week7_landing_page_ephemeral")
+        format: sql
+        rows: |
+          select 1 as visitId, CAST('2020-01-01' AS DATE) AS date union all
+          select 2 as visitId, CAST('2025-03-30'AS DATE) AS date union all
+          select 3 as visitId, CAST('2025-03-31' AS DATE) AS date
+      - input: this
+        rows:
+          - { visitId: 1, date: 2020-01-01 }
+          - { visitId: 2, date: 2025-03-30 }
+    expect:
+      rows:
+        - { visitId: 2, date: 2025-03-30 }
+        - { visitId: 3, date: 2025-03-31 }
+        

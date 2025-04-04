@@ -1,0 +1,23 @@
+unit_tests:
+  - name: fct_week6_landing_page_incremental_mode
+    model: fct_week6_landing_page
+    overrides:
+      macros:
+        is_incremental: true
+    given:
+      - input: source("test_dataset", "week5_hits")
+        rows:
+          - { visitId: 1, hitNumber: 1, date: 2020-01-01,
+            page: 'struct("" as pagePath, "" as hostname, "" as pageTitle)' }
+          - {visitId: 2, hitNumber: 1, date: 2025-03-30,
+            page: 'struct("" as pagePath, "" as hostname, "" as pageTitle)' }
+          - { visitId: 3, hitNumber: 1, date: 2025-03-31,
+            page: 'struct("" as pagePath, "" as hostname, "" as pageTitle)' }
+      - input: this
+        rows:
+          - { visitId: 1, date: 2020-01-01, pagePath: ""}
+          - {visitId: 2, date: 2025-03-30, pagePath: ""}
+    expect:
+      rows:
+        - {visitId: 2, date: 2025-03-30, pagePath: ""}
+        - {visitId: 3, date: 2025-03-31, pagePath: ""}
