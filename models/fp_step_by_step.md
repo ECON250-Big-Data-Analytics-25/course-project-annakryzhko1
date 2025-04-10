@@ -340,7 +340,7 @@ So all descriptions are already added to bigquery.
 
 1. I've found the issue with zip_code_prefix in two tables for sellers and customers, for sellers it was fixed, for customers there are still incorrect value with 4 digits code. Ideal case for custom generic data test.
 
-test: [test_is_correct_zip_code](macros/tests/test_is_correct_zip_code.sql)
+test: [test_is_correct_zip_code](../macros/tests/test_is_correct_zip_code.sql)
 
 I'm checking with regular expression that value contains 5 digits. I've added the test to model description, only for customers set severity to warning.
 
@@ -348,7 +348,7 @@ I'm checking with regular expression that value contains 5 digits. I've added th
 
 There were an issue, because I've tried to add it to models/tests where my unit tests are located. But dbt cannot find it there, so now it is in /tests folder. Also, the test was added to /tests/schema.yml.
 
-test: [assert_total_num_of_orders_coincides](tests/assert_total_num_of_orders_coincides.sql)
+test: [assert_total_num_of_orders_coincides](../tests/assert_total_num_of_orders_coincides.sql)
 
 
 
