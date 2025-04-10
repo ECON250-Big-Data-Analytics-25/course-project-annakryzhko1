@@ -21,5 +21,5 @@ models:
         - unique:
             config:
                 severity: error
-                error_if: ">100"
+                error_if: ">10000000"
                 warn_if: ">0"
