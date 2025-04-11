@@ -23,6 +23,10 @@ sources:
     database: econ250-2025  
     schema: test_dataset  
     tables:
+      - name: assignment5_input
+        description: |
+          The table contains Wikipedia pageview data for both
+           desktop (uk) and mobile (uk.m) versions
       - name: air_raid_alerts_ua
         loaded_at_field: started_at
         freshness:
