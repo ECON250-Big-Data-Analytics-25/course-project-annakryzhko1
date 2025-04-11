@@ -1,0 +1,220 @@
+version: 2
+
+sources:
+  - name: fp
+    database: econ250-2025  
+    schema: akryzhko  
+    tables:
+      - name: fp_orders
+        description: "This is the core dataset. From each order you might find all other information."
+        columns:
+          - name: order_id
+            description: "Unique identifier of the order."
+            tests:
+              - unique
+              - not_null
+          - name: customer_id
+            description: "Key to the customer dataset. Each order has a unique customer_id."
+            tests:
+              - not_null
+              - relationships:
+                  to: source('fp','fp_customers')
+                  field: customer_id
+          - name: order_status
+            description: "Reference to the order status (delivered, shipped, etc)."
+            tests:
+              - not_null
+              - accepted_values:
+                  name: unexpected_order_status
+                  values: ["approved", "canceled", "created", "delivered", "invoiced", "processing", "shipped", "unavailable"]
+          - name: order_purchase_timestamp
+            description: "Shows the purchase timestamp."
+            tests:
+              - not_null
+          - name: order_approved_at
+            description: "Shows the payment approval timestamp."
+          - name: order_delivered_carrier_date
+            description: "Shows the order posting timestamp. When it was handled to the logistic partner."
+          - name: order_delivered_customer_date
+            description: "Shows the actual order delivery date to the customer."
+          - name: order_estimated_delivery_date
+            description: "Shows the estimated delivery date that was informed to customer at the purchase moment."
+            tests:
+              - not_null
+      - name: fp_customers
+        description: |
+          This dataset has information about the customer and its location. 
+          Use it to identify unique customers in the orders dataset and to find the orders delivery location.
+          At our system each order is assigned to a unique customer_id. 
+          This means that the same customer will get different ids for different orders. 
+          The purpose of having a customer_unique_id on the dataset is to allow you 
+          to identify customers that made repurchases at the store. 
+          Otherwise you would find that each order had a different customer.
+        columns: 
+          - name: customer_id
+            description: |
+                Key to the orders dataset. 
+                Each order has a unique customer_id.
+            tests:
+              - unique
+              - not_null
+          - name: customer_unique_id
+            description: |
+                Has repeated values.
+                Used to identify the customer who make several orders,
+                customer_id is new for every order, cannot be used for that
+            tests:
+              - not_null
+          - name: customer_zip_code_prefix
+            description: |
+                first five digits of customer zip code
+            tests:
+              - not_null
+          - name: customer_city
+            description: |
+                customer city name
+            tests:
+              - not_null
+          - name: customer_state
+            description: |
+                customer state
+            tests: 
+              - not_null
+              - accepted_values: 
+                  name: unexpected_customer_state
+                  values: &state_data_tests ["AC", "AL", "AM", "AP", "BA", "CE", "DF", "ES", "GO", "MA", "MG", "MS", "MT", "PA", "PB", "PE", "PI", "PR", "RJ", "RN", "RO", "RR", "RS", "SC", "SE", "SP", "TO"]
+      - name: fp_order_items
+        description: "Includes data about the items purchased within each order."
+        columns:
+          - name: order_id
+            description: "Order unique identifier."
+            tests:
+              - not_null
+              - relationships:
+                  to: source('fp','fp_orders')
+                  field: order_id
+          - name: order_item_id
+            description: "Sequential number identifying the item within the same order."
+            tests:
+              - not_null
+          - name: product_id
+            description: "Product unique identifier."
+            tests:
+              - not_null
+              - relationships:
+                  to: source('fp','fp_products')
+                  field: product_id
+          - name: seller_id
+            description: "Seller unique identifier."
+            tests:
+              - not_null
+              - relationships:
+                  to: source('fp','fp_sellers')
+                  field: seller_id
+          - name: shipping_limit_date
+            description: "Deadline for the seller to ship the item to the logistics partner."
+            tests:
+              - not_null
+          - name: price
+            description: "Price paid for the item."
+            tests:
+              - not_null
+          - name: freight_value
+            description: "Freight (shipping) cost per item."
+            tests:
+              - not_null
+      - name: fp_products
+        description: This dataset contains product details such as dimensions, weight, and category.
+        columns:
+          - name: product_id
+            description: Unique product identifier.
+            tests:
+              - not_null
+              - unique
+          - name: product_category_name
+            description: Root category of product, in Portuguese.
+            tests:
+              - relationships:
+                  to: source('fp','fp_product_category_name_translation')
+                  field: product_category_name
+          - name: product_name_lenght
+            description: Number of characters extracted from the product name.
+          - name: product_description_lenght
+            description: Number of characters extracted from the product description.
+          - name: product_photos_qty
+            description: Number of product published photos.
+          - name: product_weight_g
+            description: Product weight measured in grams.
+          - name: product_length_cm
+            description: Product length measured in centimeters.
+          - name: product_height_cm
+            description: Product height measured in centimeters.
+          - name: product_width_cm
+            description: Product width measured in centimeters.
+      - name: fp_product_category_name_translation
+        description: This dataset maps product category names from Portuguese to English.
+        columns:
+          - name: product_category_name
+            description: Category name in Portuguese.
+            tests:
+              - not_null
+              - unique
+          - name: product_category_name_english
+            description: Category name in English.
+            tests:
+              - not_null
+              - unique
+      - name: fp_order_payments
+        description: |
+          Payment data related to order.
+          There may be several rows with same order_id if there are multiple payments on the same order
+        columns:
+          - name: order_id
+            description: Unique identifier of an order.
+            tests:
+              - not_null
+              - relationships:
+                  to: source('fp','fp_orders')
+                  field: order_id
+          - name: payment_sequential
+            description: Sequence number for multiple payments made on the same order.
+            tests:
+              - not_null
+          - name: payment_type
+            description: Method of payment chosen by the customer.
+            tests:
+              - not_null
+              - accepted_values:
+                  name: unexpected_payment_type
+                  values: ["credit_card", "voucher", "not_defined", "boleto", "debit_card"]
+          - name: payment_installments
+            description: Number of installments chosen by the customer.
+            tests:
+              - not_null
+          - name: payment_value
+            description: Transaction value.
+            tests:
+              - not_null
+      - name: fp_sellers
+        description: Sellers info, including their location.
+        columns:
+          - name: seller_id
+            description: Seller unique identifier.
+            tests:
+              - not_null
+              - unique
+          - name: seller_zip_code_prefix
+            description: First 5 digits of seller zip code.
+            tests:
+              - not_null
+          - name: seller_city
+            description: Seller city name.
+            tests:
+              - not_null
+          - name: seller_state
+            description: Seller state.    
+            tests: 
+              - not_null
+              - accepted_values: 
+                  name: unexpected_seller_state
+                  values: *state_data_tests

@@ -112,3 +112,7 @@ If everything is set up well, you will see similar output:
 
 If you have any troubles with installation, please contact the course instructor (Oleh Omelchenko) in slack for assist.
 
+## Final Project Overview
+
+[Step-By-Step](./models/fp_step_by_step.md)
+

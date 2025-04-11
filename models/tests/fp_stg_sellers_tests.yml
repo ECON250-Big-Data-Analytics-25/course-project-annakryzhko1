@@ -1,0 +1,68 @@
+unit_tests:
+  - name: fp_stg_sellers_city_patterns_fix
+    model: fp_stg_sellers
+    given:
+      - input: source('fp', 'fp_sellers')
+        rows:
+        # several white spaces
+          - {
+            seller_id: "1",  
+            seller_city: "sao   paulo", # several whitespaces
+            seller_state: "state"
+            }
+          - {
+            seller_id: "2",  
+            seller_city: "city/state", 
+            seller_state: "state"
+            }
+          - {
+            seller_id: "3",
+            seller_city: "city / state",
+            seller_state: "state"
+            }
+          - {
+            seller_id: "4",
+            seller_city: "city - state", 
+            seller_state: "state"
+            }
+          # ends with state
+          - {
+            seller_id: "5",
+            seller_city: "city sp", 
+            seller_state: "SP"
+            }
+          # comma separated, full adress
+          - {
+            seller_id: "6",
+            seller_city: "novo hamburgo, rio grande do sul, brasil", 
+            seller_state: "RS"
+            }
+          # emails, phone
+          - {
+            seller_id: "7",
+            seller_city: "4658787", 
+            seller_state: "RS"
+            }
+            # emails, phone
+          - {
+            seller_id: "8",
+            seller_city: "vendas@creditparts.com.br", 
+            seller_state: "RS"
+            }
+          # missspelled city
+          - {
+            seller_id: "9",
+            seller_city: "sao pauo", 
+            seller_state: "SP"
+            }
+    expect:
+      rows:
+        - { seller_id: "1",  seller_city: "sao paulo", seller_state: "state" }
+        - { seller_id: "2",  seller_city: "city", seller_state: "state" }
+        - { seller_id: "3",  seller_city: "city", seller_state: "state" }
+        - { seller_id: "4",  seller_city: "city", seller_state: "state" }
+        - { seller_id: "5",  seller_city: "city", seller_state: "SP" }
+        - { seller_id: "6",  seller_city: "novo hamburgo", seller_state: "RS" }
+        - { seller_id: "7",  seller_city: "(incorrect city)", seller_state: "RS" }
+        - { seller_id: "8",  seller_city: "(incorrect city)", seller_state: "RS" }
+        - { seller_id: "9",  seller_city: "sao paulo", seller_state: "SP" }

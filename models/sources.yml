@@ -1,0 +1,59 @@
+version: 2
+
+sources:
+  - name: akryzhko
+    database: econ250-2025
+    schema: akryzhko  
+    tables:
+      - name: international_top_terms
+      - name: sheet_external
+      - name: assignment1_full
+  - name: google_trends
+    database: bigquery-public-data
+    schema: google_trends
+    tables:
+      - name: international_top_terms
+        loaded_at_field: timestamp(refresh_date)
+        freshness:
+          error_after:
+            count: 2
+            period: day
+          filter: "refresh_date >= current_date() - 7"
+  - name: test_dataset
+    database: econ250-2025  
+    schema: test_dataset  
+    tables:
+      - name: assignment5_input
+        description: |
+          The table contains Wikipedia pageview data for both
+           desktop (uk) and mobile (uk.m) versions
+      - name: air_raid_alerts_ua
+        loaded_at_field: started_at
+        freshness:
+          error_after:
+            count: 2
+            period: day
+      - name: week3_arxiv
+      - name: week5_web_transactions
+        description: |
+          transaction level data. can be combined with *week5_web_visits* using `visitId` field
+          
+          May contain duplicates, for deduplicated data look at model 'week5_transactions_deduplicated_view'
+        columns:
+          - name: visitId
+            description: '{{ doc("visitid_description") }}'
+          - name: date
+          - name: transaction.transactionId
+            data_tests:
+            - unique:
+                config:
+                  severity: error
+                  error_if: ">100"
+                  warn_if: ">0"
+            - not_null:
+                config:
+                  severity: error
+                  error_if: ">10"
+                  warn_if: ">0"
+      - name: week5_web_visits
+      - name: week5_hits

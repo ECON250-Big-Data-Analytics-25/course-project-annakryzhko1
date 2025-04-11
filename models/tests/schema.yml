@@ -1,0 +1,6 @@
+version: 2
+data_tests:
+  - name: assert_total_num_of_orders_coincides
+    description: |
+      Checks that total orders count in fp_fct_sales_stats_all 
+      and fp_sales_full are the same

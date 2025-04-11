@@ -1,0 +1,145 @@
+version: 2
+
+models:
+  - name: fp_sales_full
+    description: | 
+      Contains data combined from all fp tables, 
+      contains full order info 
+    columns:
+      - name: order_id
+        description: Unique identifier of the order
+        tests:
+          - unique
+          - not_null
+      - name: customer.customer_id
+        description: |
+            Key to the orders dataset. 
+            Each order has a unique customer_id.
+      - name: customer.customer_unique_id
+        description: |
+            Has repeated values.
+            Used to identify the customer who make several orders,
+            customer_id is new for every order, cannot be used for that
+      - name: customer.customer_zip_code_prefix
+        description: |
+            first five digits of customer zip code
+      - name: customer.customer_city
+        description: |
+            customer city name
+      - name: customer.customer_state
+        description: |
+            customer state
+      - name: order_status
+        description: Reference to the order status (delivered, shipped, etc)
+      - name: is_canceled
+        description: |
+          Boolean value that checks if order is canceled
+          by the order status
+        tests:
+          - not_null
+      - name: is_shipped
+        description: |
+          Boolean value that checks if order is shipped 
+          by the order_delivered_carrier_date
+        tests:
+          - not_null
+      - name: is_delivered
+        description: |
+           Boolean value that checks if order is delivered to customer by 
+           the order_delivered_customer_date
+        tests:
+          - not_null
+      - name: is_delivered_after_estimated
+        description: |
+           Boolean value that checks if order is delivered to customer 
+           after the estimated date (difference in days is one and more)
+      - name: diff_delivered_purchased_d
+        description: |
+          Difference in days between delivered to customer 
+          and date of purchase.
+      - name: diff_shipped_purchased_d
+        description: |
+          Difference in days between delivered to carrier (shipped)
+          and date of purchase.
+      - name: diff_approved_purchased_d
+        description: |
+          Difference in days between order approval
+          and date of purchase.
+      - name: diff_delivered_by_carrier_d
+        description: |
+          Difference in days between delivered to customer 
+          and date of delivery to customer.
+      - name: diff_delivered_to_estimated_d
+        description: |
+          Difference in days between date of delivery 
+          to customer and estimated delivery date.
+      - name: order_purchase_timestamp
+        description: Shows the purchase timestamp.
+        tests:
+          - not_null
+      - name: order_approved_at
+        description: Shows the payment approval timestamp
+      - name: order_delivered_carrier_date
+        description: |
+          Shows the order posting timestamp. When it was handled to the logistic partner
+      - name: order_delivered_customer_date
+        description: Shows the actual order delivery date to the customer
+      - name: order_estimated_delivery_date
+        description: Shows the estimated delivery date that was informed to customer at the purchase moment
+        tests:
+          - not_null
+      - name: order_items.order_item_id
+        description: Sequential number identifying the item within the same order.
+      - name: order_items.product.product_id
+        description: Product unique identifier.
+      - name: order_items.product.product_category.product_category_name
+        description: Root category of product in Portuguese, serves as id.
+      - name: order_items.product.product_category.en
+        description: Category of product, english translation.
+      - name: order_items.product.product_category.pt
+        description: Category of product, portuguese translation.
+      - name: order_items.product.product_description.product_name_length
+        description: Number of characters extracted from the product name.
+      - name: order_items.product.product_description.product_description_length
+        description: Number of characters extracted from the product description.
+      - name: order_items.product.product_description.product_photos_qty
+        description: Number of product published photos.
+      - name: order_items.product.product_measurements.product_weight_g
+        description: Product weight measured in grams.
+      - name: order_items.product.product_measurements.product_length_cm
+        description: Product length measured in centimeters.
+      - name: order_items.product.product_measurements.product_height_cm
+        description: Product height measured in centimeters.
+      - name: order_items.product.product_measurements.product_width_cm
+        description: Product width measured in centimeters.
+      - name: order_items.seller_id
+        description: Seller unique identifier.
+      - name: order_items.seller_zip_code_prefix
+        description: First 5 digits of seller zip code.
+      - name: order_items.seller_city
+        description: Seller city name.
+      - name: order_items.seller_state
+        description: Seller state.    
+      - name: order_items.shipping_limit_date
+        description: "Deadline for the seller to ship the item to the logistics partner."
+      - name: order_items.price
+        description: "Price paid for the item."
+      - name: order_items.freight_value
+        description: "Freight (shipping) cost per item."
+      - name: order_items.total_amount
+        description: "Price added to freight value per item."
+      - name: order_total_amount
+        description: Total amount calculated as sum of prices for each order item with price of its delivery.
+      - name: order_payments.payment_sequential
+        description: |
+          Sequence number for multiple payments made on the same order.
+          It can start from 2, 1 is skipped
+      - name: order_payments.payment_type
+        description: Method of payment chosen by the customer.
+      - name: payment_installments
+        description: Number of installments chosen by the customer.
+      - name: order_payments.payment_value
+        description: Transaction value.
+      - name: order_payment_total
+        description: Transaction value (all payments summarized)
+      
